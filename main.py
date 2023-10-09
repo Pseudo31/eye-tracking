@@ -4,6 +4,9 @@ import pyautogui
 cam = cv2.VideoCapture(0)
 face_mesh = mp.solutions.face_mesh.FaceMesh(refine_landmarks=True)
 screen_w, screen_h = pyautogui.size()
+
+holding = False  # Variable to keep track of whether the mouse button is being held
+
 while True:
     _, frame = cam.read()
     frame = cv2.flip(frame, 1)
@@ -27,7 +30,13 @@ while True:
             y = int(landmark.y * frame_h)
             cv2.circle(frame, (x, y), 3, (0, 255, 255))
         if (left[0].y - left[1].y) < 0.0005:
-            pyautogui.click()
-            pyautogui.sleep(1)
+            if not holding:  # If not already holding, start holding
+                pyautogui.mouseDown()
+                holding = True
+        else:
+            if holding:  # If holding, release the mouse button
+                pyautogui.mouseUp()
+                holding = False
+
     cv2.imshow('Eye Controlled Mouse', frame)
     cv2.waitKey(1)
